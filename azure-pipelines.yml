@@ -8,10 +8,29 @@ trigger:
 
 pool:
   name: 'Pool1'
-
+  
 variables:
   buildConfiguration: 'Release'
 
 steps:
+- checkout: self
+  fetchDepth: 0
+
+- task: SonarCloudPrepare@3
+  inputs:
+    SonarQube: 'SonarQubeConn1'
+    organization: 'iwan1234'
+    scannerMode: 'dotnet'
+    projectKey: 'iwanbudiman_sonarcloud'
+    projectName: 'sonarcloud'
+
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+
+- task: SonarCloudAnalyze@3
+  inputs:
+    jdkversion: 'JAVA_HOME_17_X64'
+
+- task: SonarCloudPublish@3
+  inputs:
+    pollingTimeoutSec: '300'
